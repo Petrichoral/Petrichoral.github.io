@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>CS 559 Assignment 2 Samuel Julson</title>
+  </head>
+  <body onload="app.onload()">
+    <canvas id="2dcanvas">
+      It seems the browser you are using does not support the canvas element.
+    </canvas>
+    <br/>
+    <p>Wind</p>
+    <input id="slider1" type="range">
+    <br/>
+    <a href="https://www.cs.ubc.ca/labs/imager/tr/2002/bakay2002a/bakay.2002a.pdf">Inspiration</a>
+    <div>
+      <p style="word-wrap:break-word;width:640px;">
+        I was going to add in a day / night cycle, but this is this the best I can do in my current timeframe.
+        The heiarchal model here is the ground. There's a base square
+        with all of the grass chutes popping out of it, each grass blade
+        itself being a heiarchal model of line segments.
+        A lot of this is randomized so if you don't like the picture you got, just refresh the page.
+      </p>
+   </div>
+  </body>
+  <script src="./index.js"></script>
+</html>
