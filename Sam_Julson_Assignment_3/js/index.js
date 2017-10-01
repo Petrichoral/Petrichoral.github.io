@@ -11,7 +11,20 @@ app.slider1 = document.getElementById("slider1");
 app.slider2 = document.getElementById("slider2");
 app.slider3 = document.getElementById("slider3");
 app.checkbox1 = document.getElementById("checkbox1");
+app.slider4 = document.getElementById("slider4");
+app.slider5 = document.getElementById("slider5");
+app.slider6 = document.getElementById("slider6");
 app.can_move = false;
+
+app.moveToTx = function(ctx, Tx, v) {
+  twgl.m4.transformPoint(Tx, v, v);
+  ctx.moveTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
+}
+
+app.lineToTx = function(ctx, Tx, v) {
+  twgl.m4.transformPoint(Tx, v, v);
+  ctx.lineTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
+}
 
 app.onload = function() {
   setInterval(app.loop, 1000 / 60);
@@ -21,28 +34,50 @@ app.loop = (function() {
 
   var ctx = app.canvas.getContext("2d");
   var tstack = [twgl.m4.identity()];
-  var angle1;
-  var angle2;
+  var camera_angle_x_z;
+  var camera_angle_y;
   var radius;
   var isPerspective;
+  var cube1_angle_x;
+  var cube2_angle_y;
+  var cube3_angle_z;
+
+  var drawCube = function(Tx) {
+    app.ctx.beginPath();
+    app.moveToTx(app.ctx, Tx, [-1, -1, -1]);
+
+    app.lineToTx(app.ctx, Tx, [1, -1, -1]);
+    app.lineToTx(app.ctx, Tx, [1, 1, -1]);
+    app.lineToTx(app.ctx, Tx, [-1, 1, -1]);
+    app.lineToTx(app.ctx, Tx, [-1, -1, -1]);
+
+    app.lineToTx(app.ctx, Tx, [-1, -1, 1]);
+
+    app.lineToTx(app.ctx, Tx, [-1, 1, 1]);
+    app.lineToTx(app.ctx, Tx, [-1, 1, -1]);
+    app.moveToTx(app.ctx, Tx, [-1, 1, 1]);
+
+    app.lineToTx(app.ctx, Tx, [1, 1, 1]);
+    app.lineToTx(app.ctx, Tx, [1, 1, -1]);
+    app.moveToTx(app.ctx, Tx, [1, 1, 1]);
+
+    app.lineToTx(app.ctx, Tx, [1, -1, 1]);
+    app.lineToTx(app.ctx, Tx, [1, -1, -1]);
+    app.moveToTx(app.ctx, Tx, [1, -1, 1]);
+
+    app.lineToTx(app.ctx, Tx, [-1, -1, 1]);
+
+    app.ctx.stroke();
+    app.ctx.closePath();
+  }
 
   //TODO: Make sure that points not in view do not get drawn
-
-  var moveToTx = function(ctx, Tx, v) {
-    twgl.m4.transformPoint(Tx, v, v);
-    ctx.moveTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
-  }
-
-  var lineToTx = function(ctx, Tx, v) {
-    twgl.m4.transformPoint(Tx, v, v);
-    ctx.lineTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
-  }
 
   var update = (function() {
 
     var past = Date.now();
-    angle1 = app.slider1.value*0.01*2*Math.PI;
-    angle2 = app.slider2.value*0.01*Math.PI;
+    camera_angle_x_z = app.slider1.value*0.01*2*Math.PI;
+    camera_angle_y = app.slider2.value*0.01*Math.PI;
     radius = app.slider3.value*0.01;
 
     return (function() {
@@ -50,10 +85,14 @@ app.loop = (function() {
       var deltaTime = present - past;
       past = present;
 
-      angle1 = app.slider1.value*0.01*2*Math.PI;
-      angle2 = app.slider2.value*0.01*Math.PI;
+      camera_angle_x_z = app.slider1.value*0.01*2*Math.PI;
+      camera_angle_y = app.slider2.value*0.01*Math.PI;
       radius = app.slider3.value*0.01;
       isPerspective = app.checkbox1.checked;
+
+      cube1_angle_x = app.slider4.value*0.01*2*Math.PI;
+      cube2_angle_y = app.slider5.value*0.01*2*Math.PI;
+      cube3_angle_z = app.slider6.value*0.01*2*Math.PI;
     });
   })();
 
@@ -63,9 +102,9 @@ app.loop = (function() {
 
     //TODO: Convert to quaternion rotation.
     /* World to Camera */
-    var eye = [1000 * radius * Math.cos(angle1) * Math.sin(angle2),
-               1000 * radius * Math.cos(angle2),
-               1000 * radius * Math.sin(angle1) * Math.sin(angle2)];
+    var eye = [1000 * radius * Math.cos(camera_angle_x_z) * Math.sin(camera_angle_y),
+               1000 * radius * Math.cos(camera_angle_y),
+               1000 * radius * Math.sin(camera_angle_x_z) * Math.sin(camera_angle_y)];
 
     //eye = [1, 1, 1];
     tstack.unshift(twgl.m4.multiply(tstack[0],
@@ -87,59 +126,51 @@ app.loop = (function() {
     //Draw axis
     app.ctx.strokeStyle = "#FF0000";
     app.ctx.beginPath();
-    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
-    lineToTx(app.ctx, tstack[0], [1, 0, 0]);
+    app.moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    app.lineToTx(app.ctx, tstack[0], [1, 0, 0]);
     app.ctx.stroke();
     app.ctx.closePath();
 
     app.ctx.strokeStyle = "#00FF00";
     app.ctx.beginPath();
-    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
-    lineToTx(app.ctx, tstack[0], [0, 1, 0]);
+    app.moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    app.lineToTx(app.ctx, tstack[0], [0, 1, 0]);
     app.ctx.stroke();
     app.ctx.closePath();
 
     app.ctx.strokeStyle = "#0000FF";
     app.ctx.beginPath();
-    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
-    lineToTx(app.ctx, tstack[0], [0, 0, 1]);
+    app.moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    app.lineToTx(app.ctx, tstack[0], [0, 0, 1]);
     app.ctx.stroke();
     app.ctx.closePath();
 
     app.ctx.strokeStyle = "black";
 
-    /* Axis to cube */
-    tstack.unshift(twgl.m4.translate(tstack[0], [1, 1, 1]));
+    /* Axis to cube1 */
+    tstack.unshift(twgl.m4.axisRotate(twgl.m4.scale(twgl.m4.translate(tstack[0], [1, 1, 1]), [0.5, 0.5, 0.5]), [1, 0, 0], cube1_angle_x));
     /**/
 
-    //Draw cube
-    app.ctx.beginPath();
-    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    drawCube(tstack[0]);
 
-    lineToTx(app.ctx, tstack[0], [1, 0, 0]);
-    lineToTx(app.ctx, tstack[0], [1, 1, 0]);
-    lineToTx(app.ctx, tstack[0], [0, 1, 0]);
-    lineToTx(app.ctx, tstack[0], [0, 0, 0]);
+    /* Cube1 to Cube2 */
 
-    lineToTx(app.ctx, tstack[0], [0, 0, 1]);
+    tstack.unshift(twgl.m4.axisRotate(twgl.m4.scale(tstack[0], [0.75, 0.75, 0.75]), [0, 1, 0], cube2_angle_y));
 
-    lineToTx(app.ctx, tstack[0], [0, 1, 1]);
-    lineToTx(app.ctx, tstack[0], [0, 1, 0]);
-    moveToTx(app.ctx, tstack[0], [0, 1, 1]);
+    //Draw subcube
 
-    lineToTx(app.ctx, tstack[0], [1, 1, 1]);
-    lineToTx(app.ctx, tstack[0], [1, 1, 0]);
-    moveToTx(app.ctx, tstack[0], [1, 1, 1]);
+    drawCube(tstack[0]);
 
-    lineToTx(app.ctx, tstack[0], [1, 0, 1]);
-    lineToTx(app.ctx, tstack[0], [1, 0, 0]);
-    moveToTx(app.ctx, tstack[0], [1, 0, 1]);
+    /**/
 
-    lineToTx(app.ctx, tstack[0], [0, 0, 1]);
+    /* Cube2 to Cube3 */
 
-    app.ctx.stroke();
-    app.ctx.closePath();
+    tstack.unshift(twgl.m4.axisRotate(twgl.m4.scale(tstack[0], [0.75, 0.75, 0.75]), [0, 0, 1], cube3_angle_z));
 
+    drawCube(tstack[0]);
+
+    tstack.shift();
+    tstack.shift();
     tstack.shift();
     tstack.shift();
     tstack.shift();

@@ -5,14 +5,19 @@
     <title>CS 559 Assignment 3 Samuel Julson</title>
   </head>
   <body onload="app.onload()">
-    <canvas id="2dcanvas" width="640" height="480">
+    <canvas id="2dcanvas" width="800" height="600">
       It seems the browser you are using does not support the canvas element.
     </canvas>
     <br/>
+    <p>Camera Controls</p>
     <input id="slider1" type="range"/>left-right<br/>
     <input id="slider2" type="range"/>up-down<br/>
     <input id="slider3" type="range"/>in-out<br/>
     <input id="checkbox1" type="checkbox"/>orthogonal/perspective
+    <p>Cube Controls</p>
+    <input id="slider4" type="range"/>cube 1 on x<br/>
+    <input id="slider5" type="range"/>cube 2 on y<br/>
+    <input id="slider6" type="range"/>cube 3 on z<br/>
     <br/>
   </body>
   <script src="./js/twgl.js"></script>
