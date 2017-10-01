@@ -17,9 +17,6 @@ app.onload = function() {
   setInterval(app.loop, 1000 / 60);
 }
 
-
-app.onmouse
-
 app.loop = (function() {
 
   var ctx = app.canvas.getContext("2d");
