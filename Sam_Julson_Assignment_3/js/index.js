@@ -16,16 +16,6 @@ app.slider5 = document.getElementById("slider5");
 app.slider6 = document.getElementById("slider6");
 app.can_move = false;
 
-app.moveToTx = function(ctx, Tx, v) {
-  twgl.m4.transformPoint(Tx, v, v);
-  ctx.moveTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
-}
-
-app.lineToTx = function(ctx, Tx, v) {
-  twgl.m4.transformPoint(Tx, v, v);
-  ctx.lineTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
-}
-
 app.onload = function() {
   setInterval(app.loop, 1000 / 60);
 }
@@ -37,35 +27,46 @@ app.loop = (function() {
   var camera_angle_x_z;
   var camera_angle_y;
   var radius;
+  var eye;
   var isPerspective;
   var cube1_angle_x;
   var cube2_angle_y;
   var cube3_angle_z;
 
+  var moveToTx = function(ctx, Tx, v) {
+    twgl.m4.transformPoint(Tx, v, v);
+    ctx.moveTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
+  }
+
+  var lineToTx = function(ctx, Tx, v) {
+    twgl.m4.transformPoint(Tx, v, v);
+    ctx.lineTo(v[0] + app.canvas.width / 2, -v[1] + app.canvas.height / 2);
+  }
+
   var drawCube = function(Tx) {
     app.ctx.beginPath();
-    app.moveToTx(app.ctx, Tx, [-1, -1, -1]);
+    moveToTx(app.ctx, Tx, [-1, -1, -1]);
 
-    app.lineToTx(app.ctx, Tx, [1, -1, -1]);
-    app.lineToTx(app.ctx, Tx, [1, 1, -1]);
-    app.lineToTx(app.ctx, Tx, [-1, 1, -1]);
-    app.lineToTx(app.ctx, Tx, [-1, -1, -1]);
+    lineToTx(app.ctx, Tx, [1, -1, -1]);
+    lineToTx(app.ctx, Tx, [1, 1, -1]);
+    lineToTx(app.ctx, Tx, [-1, 1, -1]);
+    lineToTx(app.ctx, Tx, [-1, -1, -1]);
 
-    app.lineToTx(app.ctx, Tx, [-1, -1, 1]);
+    lineToTx(app.ctx, Tx, [-1, -1, 1]);
 
-    app.lineToTx(app.ctx, Tx, [-1, 1, 1]);
-    app.lineToTx(app.ctx, Tx, [-1, 1, -1]);
-    app.moveToTx(app.ctx, Tx, [-1, 1, 1]);
+    lineToTx(app.ctx, Tx, [-1, 1, 1]);
+    lineToTx(app.ctx, Tx, [-1, 1, -1]);
+    moveToTx(app.ctx, Tx, [-1, 1, 1]);
 
-    app.lineToTx(app.ctx, Tx, [1, 1, 1]);
-    app.lineToTx(app.ctx, Tx, [1, 1, -1]);
-    app.moveToTx(app.ctx, Tx, [1, 1, 1]);
+    lineToTx(app.ctx, Tx, [1, 1, 1]);
+    lineToTx(app.ctx, Tx, [1, 1, -1]);
+    moveToTx(app.ctx, Tx, [1, 1, 1]);
 
-    app.lineToTx(app.ctx, Tx, [1, -1, 1]);
-    app.lineToTx(app.ctx, Tx, [1, -1, -1]);
-    app.moveToTx(app.ctx, Tx, [1, -1, 1]);
+    lineToTx(app.ctx, Tx, [1, -1, 1]);
+    lineToTx(app.ctx, Tx, [1, -1, -1]);
+    moveToTx(app.ctx, Tx, [1, -1, 1]);
 
-    app.lineToTx(app.ctx, Tx, [-1, -1, 1]);
+    lineToTx(app.ctx, Tx, [-1, -1, 1]);
 
     app.ctx.stroke();
     app.ctx.closePath();
@@ -102,9 +103,9 @@ app.loop = (function() {
 
     //TODO: Convert to quaternion rotation.
     /* World to Camera */
-    var eye = [1000 * radius * Math.cos(camera_angle_x_z) * Math.sin(camera_angle_y),
-               1000 * radius * Math.cos(camera_angle_y),
-               1000 * radius * Math.sin(camera_angle_x_z) * Math.sin(camera_angle_y)];
+    eye = [1000 * radius * Math.cos(camera_angle_x_z) * Math.sin(camera_angle_y),
+           1000 * radius * Math.cos(camera_angle_y),
+           1000 * radius * Math.sin(camera_angle_x_z) * Math.sin(camera_angle_y)];
 
     //eye = [1, 1, 1];
     tstack.unshift(twgl.m4.multiply(tstack[0],
@@ -117,7 +118,7 @@ app.loop = (function() {
 
     /* Perspective or Orthogonal */
     if (isPerspective) {
-      tstack.unshift(twgl.m4.multiply(tstack[0], twgl.m4.scale(twgl.m4.perspective(Math.PI / 360, 1, 1, 1), [-1, -1, -1])));
+      tstack.unshift(twgl.m4.multiply(tstack[0], twgl.m4.scale(twgl.m4.perspective(Math.PI / 360, 1, -1, 1), [-1, -1, -1])));
     } else {
       tstack.unshift(twgl.m4.multiply(tstack[0], twgl.m4.ortho(-1, 1, -1, 1, -1, 1)));
     }
@@ -126,22 +127,22 @@ app.loop = (function() {
     //Draw axis
     app.ctx.strokeStyle = "#FF0000";
     app.ctx.beginPath();
-    app.moveToTx(app.ctx, tstack[0], [0, 0, 0]);
-    app.lineToTx(app.ctx, tstack[0], [1, 0, 0]);
+    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    lineToTx(app.ctx, tstack[0], [1, 0, 0]);
     app.ctx.stroke();
     app.ctx.closePath();
 
     app.ctx.strokeStyle = "#00FF00";
     app.ctx.beginPath();
-    app.moveToTx(app.ctx, tstack[0], [0, 0, 0]);
-    app.lineToTx(app.ctx, tstack[0], [0, 1, 0]);
+    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    lineToTx(app.ctx, tstack[0], [0, 1, 0]);
     app.ctx.stroke();
     app.ctx.closePath();
 
     app.ctx.strokeStyle = "#0000FF";
     app.ctx.beginPath();
-    app.moveToTx(app.ctx, tstack[0], [0, 0, 0]);
-    app.lineToTx(app.ctx, tstack[0], [0, 0, 1]);
+    moveToTx(app.ctx, tstack[0], [0, 0, 0]);
+    lineToTx(app.ctx, tstack[0], [0, 0, 1]);
     app.ctx.stroke();
     app.ctx.closePath();
 
