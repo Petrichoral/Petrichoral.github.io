@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Sam Julson CS 559 Assignment 6</title>
+  </head>
+  <body>
+    <canvas id="glcanvas" height="480" width="640"></canvas></br>
+  </body>
+  <script src="./js/twgl.js"></script>
+  <script src="./js/webgl-obj-loader.js"></script>
+  <script id="vshdr" type="x-shader/x-vertex">
+    precision highp float;
+    attribute vec3 position;
+    attribute vec3 normal;
+    attribute vec4 color;
+    uniform mat4 normalMatrix;
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;
+    varying vec3 fNormal;
+    varying vec3 fPosition;
+    varying vec4 fColor;
+
+    void main()
+    {
+      fColor = color;
+      vec4 pos = (modelViewMatrix * vec4(position, 1.0));
+      fNormal = normalize(mat3(normalMatrix) * normal);
+      fPosition = pos.xyz;
+      gl_Position = projectionMatrix * pos;
+    }
+  </script>
+  <script id="fshdr" type="x-shader/x-fragment">
+    precision highp float;
+    varying vec3 fPosition;
+    varying vec3 fNormal;
+    varying vec4 fColor;
+
+    const float ambient_coeff = 0.4;
+    const float diffuse_coeff = 0.6;
+    const float specular_coeff = 0.0;
+    const float specular_exp = 64.0;
+
+    const vec3 ambient_ref = vec3(1.0, 1.0, 1.0);
+    const vec3 diffuse_ref = vec3(1.0, 1.0, 1.0);
+    const vec3 specular_ref = vec3(1.0, 1.0, 1.0);
+
+    const vec3 light_pos = vec3(1.0, 1.0, 1.0);
+
+    void main()
+    {
+      vec3 ambient = ambient_coeff * ambient_ref;
+      vec3 diffuse = diffuse_coeff * dot(fNormal, light_pos) * diffuse_ref;
+      vec3 specular = 
+          specular_coeff *
+          pow(max(0.0, dot(fNormal, light_pos)), specular_exp) *
+          specular_ref;
+      gl_FragColor = vec4((ambient + diffuse + specular) * fColor.xyz, fColor.w);
+    }
+  </script>
+  <script src="./js/index.js"></script>
+</html>

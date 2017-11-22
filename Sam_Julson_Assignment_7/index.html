@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Graphics town framework code by Mike Gleicher
+  -- written October, 2015
+  -->
+  <head>
+      <meta charset="UTF-8">
+      <title>Sam Julson CS 559 Assignment 7 </title>
+  </head>
+  <body>
+    <!-- load this stuff first -->
+    <script src="Libraries/twgl-full.js"></script>
+    <script src="Libraries/panel.js"></script>
+    <script src="Libraries/arcball.js"></script>
+    <script src="grobject.js"></script>
+    <script src="graphicstown.js"></script>
+    <!-- Shaders go here -->
+    <script id="octahedron-vshader" type="x-shader/x-vertex">
+      precision highp float;
+      uniform mat4 normalMatrix;
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform vec3 sunDirection;
+      attribute vec3 position;
+      attribute vec3 normal;
+      attribute vec4 color;
+      varying vec3 fPosition;
+      varying vec3 fNormal;
+      varying vec3 fColor;
+
+      void main() {
+        fNormal = normalize(mat3(normalMatrix) * normal);
+        vec4 pos = modelViewMatrix * vec4(position, 1.0);
+        fPosition = pos.xyz;
+        fColor = color.xyz;
+        gl_Position = projectionMatrix * pos;
+      }
+    </script>
+    <script id="octahedron-fshader" type="x-shader/x-fragment">
+      precision highp float;
+      uniform vec3 sunDirection;
+      varying vec3 fPosition;
+      varying vec3 fNormal;
+      varying vec3 fColor;
+      const float ambient_coeff = 0.0;
+      const float diffuse_coeff = 1.0;
+      const float specular_coeff = 1.0;
+      const float specular_exp = 16.0;
+      
+      void main() {
+        vec3 l = normalize(sunDirection);
+        vec3 n = normalize(fNormal);
+        vec3 e = normalize(-fPosition);
+        vec3 h = normalize(e+l);
+
+        vec3 ambient_color  = ambient_coeff * fColor;
+        vec3 diffuse_color  = diffuse_coeff * dot(n,l) * fColor;
+        vec3 specular_color = 
+            specular_coeff *
+            pow(max(0.0,dot(n,h)),specular_exp) * 
+            fColor;
+
+        gl_FragColor = vec4(ambient_color+diffuse_color+specular_color, 1.0);
+      }
+    </script>
+    <script id="icosahedron-vshader" type="x-shader/x-vertex">
+      precision highp float;
+      uniform mat4 normalMatrix;
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform vec3 sunDirection;
+      attribute vec3 position;
+      attribute vec3 normal;
+      attribute vec4 color;
+      varying vec3 fPosition;
+      varying vec3 fNormal;
+      varying vec3 fColor;
+
+      void main() {
+        fNormal = normalize(mat3(normalMatrix) * normal);
+        vec4 pos = modelViewMatrix * vec4(position, 1.0);
+        fPosition = pos.xyz;
+        fColor = color.xyz;
+        gl_Position = projectionMatrix * pos;
+      }
+    </script>
+    <script id="icosahedron-fshader" type="x-shader/x-fragment">
+      precision highp float;
+      uniform vec3 sunDirection;
+      varying vec3 fPosition;
+      varying vec3 fNormal;
+      varying vec3 fColor;
+      const float ambient_coeff = 0.0;
+      const float diffuse_coeff = 1.0;
+      const float specular_coeff = 1.0;
+      const float specular_exp = 16.0;
+      
+      void main() {
+        vec3 l = normalize(sunDirection);
+        vec3 n = normalize(fNormal);
+        vec3 e = normalize(-fPosition);
+        vec3 h = normalize(e+l);
+
+        vec3 ambient_color  = ambient_coeff * fColor;
+        vec3 diffuse_color  = diffuse_coeff * dot(n,l) * fColor;
+        vec3 specular_color = 
+            specular_coeff *
+            pow(max(0.0,dot(n,h)),specular_exp) * 
+            fColor;
+
+        gl_FragColor = vec4(ambient_color+diffuse_color+specular_color, 1.0);
+      }
+    </script>
+    <script id="garage-vshader" type="x-shader/x-vertex">
+      precision highp float;
+      uniform mat4 normalMatrix;
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform vec3 sunDirection;
+      attribute vec3 position;
+      attribute vec3 normal;
+      attribute vec4 color;
+      varying vec3 fPosition;
+      varying vec3 fNormal;
+      varying vec3 fColor;
+
+      void main() {
+        fNormal = normalize(mat3(normalMatrix) * normal);
+        vec4 pos = modelViewMatrix * vec4(position, 1.0);
+        fPosition = pos.xyz;
+        fColor = color.xyz;
+        gl_Position = projectionMatrix * pos;
+      }
+    </script>
+    <script id="garage-fshader" type="x-shader/x-fragment">
+      precision highp float;
+      uniform vec3 sunDirection;
+      varying vec3 fPosition;
+      varying vec3 fNormal;
+      varying vec3 fColor;
+      const float ambient_coeff = 0.0;
+      const float diffuse_coeff = 1.0;
+      const float specular_coeff = 1.0;
+      const float specular_exp = 16.0;
+      
+      void main() {
+        gl_FragColor = vec4(fColor, 1.0);
+      }
+    </script>
+    <!-- Loaded Obj files go here -->
+    <!-- Javascript Objects go here -->
+    <script src="Objects/GrObject.js"></script>
+    <script src="Objects/Octahedron.js"></script>
+    <script src="Objects/Icosahedron.js"></script>
+    <script src="Objects/Garage.js"></script>
+    <!-- Scene file goes here -->
+    <script src="Scene.js"></script>
+  </body>
+</html>
